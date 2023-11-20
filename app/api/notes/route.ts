@@ -18,7 +18,7 @@ export const POST = async (req: NextRequest) => {
     await connectDB();
     const body = await req.json();
     const newNote = await Note.create(body);
-    return NextResponse.json({ message: "Note has been created", updatedData: newNote }, { status: 201 });
+    return NextResponse.json({ message: "Note has been created", data: newNote }, { status: 201 });
   }
   catch (err) {
     return NextResponse.json({ message: "Error", err }, { status: 500 });
