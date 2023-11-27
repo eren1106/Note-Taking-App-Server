@@ -22,7 +22,7 @@ export const PUT = async (req: NextRequest, { params }: any) => {
     await connectDB();
     const body = await req.json();
     await Note.findByIdAndUpdate(id, {...body});
-    return NextResponse.json({ message: "Note has been updated"}, { status: 201 });
+    return NextResponse.json({ message: "Note has been updated"}, { status: 200 });
   }
   catch (err) {
     return NextResponse.json({ message: "Error", err }, { status: 500 });
