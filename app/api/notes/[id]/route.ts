@@ -8,6 +8,7 @@ export const GET = async (req: NextRequest, { params }: { params: { id: string }
   try {
     await connectDB();
     const note = await Note.findOne({_id: id});
+    if(!note) return NextResponse.json({ message: "Data not found" }, { status: 404 });
     return NextResponse.json({ data: note }, { status: 200 });
   }
   catch (err) {
