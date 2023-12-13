@@ -1,4 +1,5 @@
 import Note from "@/app/models/Note";
+import { deleteApiResponse, errorResponse, getApiResponse, putApiResponse } from "@/utils/api-response";
 import connectDB from "@/utils/db"
 import { NextRequest, NextResponse } from "next/server";
 
@@ -8,11 +9,10 @@ export const GET = async (req: NextRequest, { params }: { params: { id: string }
   try {
     await connectDB();
     const note = await Note.findOne({_id: id});
-    if(!note) return NextResponse.json({ message: "Data not found" }, { status: 404 });
-    return NextResponse.json({ data: note }, { status: 200 });
+    return getApiResponse(note);
   }
   catch (err) {
-    return NextResponse.json({ message: "Error", err }, { status: 500 });
+    return errorResponse(err);
   }
 }
 
@@ -22,11 +22,11 @@ export const PUT = async (req: NextRequest, { params }: any) => {
   try {
     await connectDB();
     const body = await req.json();
-    await Note.findByIdAndUpdate(id, {...body});
-    return NextResponse.json({ message: "Note has been updated"}, { status: 200 });
+    const updatedNote = await Note.findByIdAndUpdate(id, {...body}, { new: true });
+    return putApiResponse(updatedNote, 'note');
   }
   catch (err) {
-    return NextResponse.json({ message: "Error", err }, { status: 500 });
+    return errorResponse(err);
   }
 }
 
@@ -36,9 +36,9 @@ export const DELETE = async (req: NextRequest, { params }: any) => {
   try {
     await connectDB();
     const note = await Note.findByIdAndDelete(id);
-    return NextResponse.json({ message: "Note has been deleted", data: note }, { status: 200 });
+    return deleteApiResponse(note, 'note');
   }
   catch (err) {
-    return NextResponse.json({ message: "Error", err }, { status: 500 });
+    return errorResponse(err);
   }
 }

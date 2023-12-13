@@ -17,8 +17,8 @@ import { NextResponse } from "next/server";
 interface INextResponse {
   message: string;
   data?: any;
-  status: string;
-  statusCode: number;
+  status?: string;
+  statusCode?: number;
   extra?: any;
 }
 
@@ -33,36 +33,9 @@ const nextResponse = (
 ) => NextResponse.json({
   message: message,
   data: data,
-  status: status,
+  status: status || 'SUCCESS',
   extra: extra || '',
-}, { status: statusCode });
-
-const noResultResponse = () => {
-  return nextResponse({
-    message: 'No results found',
-    data: '',
-    status: 'SUCCESS',
-    statusCode: STATUS_CODES.NOT_FOUND,
-  });
-}
-
-const noResultArrayResponse = () => {
-  return nextResponse({
-    message: 'No results found',
-    data: [],
-    status: 'SUCCESS',
-    statusCode: STATUS_CODES.OK,
-  });
-}
-
-const resultFoundResponse = <T>(result: T) => {
-  return nextResponse({
-    message: 'Results found',
-    data: result,
-    status: 'SUCCESS',
-    statusCode: STATUS_CODES.OK,
-  });
-}
+}, { status: statusCode || STATUS_CODES.OK });
 
 export const getApiResponse = <T>(result: T) => {
   if (Array.isArray(result) && result.length === 0) {
@@ -75,14 +48,61 @@ export const getApiResponse = <T>(result: T) => {
   }
 }
 
-export const errorResponse = (error: any) => {
+export const errorResponse = (error: any, result?: any) => {
   return nextResponse({
     message: error,
-    extra: '',
-    status: 'ERROR',
+    extra: result,
+    status: 'FAILED',
     statusCode: STATUS_CODES.INTERNAL_SERVER_ERROR,
   })
 }
+
+export const postApiResponse = <T>(result: T, name?: string) => {
+  return nextResponse({
+    message: (name || 'Data') + ' created',
+    data: result,
+  });
+}
+
+export const putApiResponse = <T>(result: T, name?: string) => {
+  if(!result) return noResultResponse();
+  return nextResponse({
+    message: (name || 'Data') + ' updated',
+    data: result,
+  });
+}
+
+export const deleteApiResponse = <T>(result: T, name?: string) => {
+  if(!result) return noResultResponse();
+  return nextResponse({
+    message: (name || 'Data') + ' deleted',
+    data: result,
+    extra: '',
+  });
+}
+
+const noResultResponse = () => {
+  return nextResponse({
+    message: 'Data not found',
+    status: 'FAILED',
+    statusCode: STATUS_CODES.NOT_FOUND,
+  });
+}
+
+const noResultArrayResponse = () => {
+  return nextResponse({
+    message: 'No results found',
+    data: [],
+  });
+}
+
+const resultFoundResponse = <T>(result: T) => {
+  return nextResponse({
+    message: 'Results found',
+    data: result,
+  });
+}
+
 // const getApiResponseOneRecord = <T>(result: T) => {
 //   if (!result) {
 //     const error = new Error('No data');
@@ -115,42 +135,18 @@ export const errorResponse = (error: any) => {
 //   }
 // }
 
-const postApiResponse = <T>(result: T, createdName?: string) => {
-  return {
-    message: createdName + ' created',
-    data: result,
-    extra: '',
-  };
-}
+// const upsertApiResponse = <T>(result: T, name?: string) => {
+//   return {
+//     message: name + ' upserted',
+//     data: result,
+//     extra: '',
+//   };
+// }
 
-const upsertApiResponse = <T>(result: T, name?: string) => {
-  return {
-    message: name + ' upserted',
-    data: result,
-    extra: '',
-  };
-}
-
-const updateApiResponse = <T>(result: T, name?: string) => {
-  return {
-    message: name + ' updated',
-    data: result,
-    extra: '',
-  };
-}
-
-const updateApiFailedResponse = <T>(result: T, msg?: string) => {
-  return {
-    message: 'Error: ' + msg,
-    data: result,
-    extra: 'true',
-  };
-}
-
-const deleteApiResponse = <T>(result: T, deletedName?: string) => {
-  return {
-    message: deletedName + ' deleted',
-    data: result,
-    extra: '',
-  };
-}
+// const updateApiFailedResponse = <T>(result: T, msg?: string) => {
+//   return {
+//     message: 'Error: ' + msg,
+//     data: result,
+//     extra: 'true',
+//   };
+// }

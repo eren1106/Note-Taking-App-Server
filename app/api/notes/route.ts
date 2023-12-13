@@ -1,7 +1,7 @@
 import Note, { INote } from "@/app/models/Note";
-import { getApiResponse, errorResponse } from "@/utils/api-response";
+import { getApiResponse, errorResponse, postApiResponse } from "@/utils/api-response";
 import connectDB from "@/utils/db"
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export const GET = async () => {
   try {
@@ -19,9 +19,9 @@ export const POST = async (req: NextRequest) => {
     await connectDB();
     const body = await req.json();
     const newNote = await Note.create(body);
-    return NextResponse.json({ message: "Note has been created", data: newNote }, { status: 200 });
+    return postApiResponse(newNote, 'note');
   }
   catch (err) {
-    return NextResponse.json({ message: "Error", err }, { status: 500 });
+    return errorResponse(err);
   }
 }
